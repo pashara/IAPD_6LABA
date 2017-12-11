@@ -10,17 +10,12 @@ namespace Laba_7
 {
     static class WiFiConnection
     {
-
-        
-
         public static void Connect(Wlan.WlanAvailableNetwork network, WlanClient.WlanInterface wlanIface,String key = "")
         {
             
             AWifiType a = null;
             String profileName = System.Text.ASCIIEncoding.ASCII.GetString(network.dot11Ssid.SSID).Trim((char)0);
             
-
-
             switch (network.dot11DefaultAuthAlgorithm)
             {
                 case Wlan.Dot11AuthAlgorithm.IEEE80211_Open:
@@ -29,8 +24,6 @@ namespace Laba_7
                         Network = network,
                         ProfileName = profileName,
                         WlanIface = wlanIface,
-                        Authentication = "",
-                        Encryption = ""
                     };
                     break;
 
@@ -40,8 +33,6 @@ namespace Laba_7
                         Network = network,
                         ProfileName = profileName,
                         WlanIface = wlanIface,
-                        Authentication = "",
-                        Encryption = "",
                         Key = key,
                     };
                     break;
@@ -52,8 +43,6 @@ namespace Laba_7
                         Network = network,
                         ProfileName = profileName,
                         WlanIface = wlanIface,
-                        Authentication = "",
-                        Encryption = "",
                         Key = key,
                     };
                     break;
