@@ -10,69 +10,52 @@ namespace Laba_7
 {
     public class WiFiPoint
     {
-        public string SSID
+        public string Name { get; set; }
+        public string SignalStrength { get; set; }
+        public string Description { get; set; }
+        public List<string> BssId { get; set; }
+        public bool IsSecured { get; set; }
+        public bool IsConnected { get; set; }
+
+        public string BssIds
         {
-            get;
-            set;
-        }
-
-        public string Quality
-        {
-            get;
-            set;
-        }
-
-        public string AuthAlgorithm
-        {
-            get;
-            set;
-        }
-
-
-        public string Mac
-        {
-            get;
-            set;
-        }
-
-
-        public bool HasProfile
-        {
-            get;
-            set;
-        }
-
-        public bool HasConnected
-        {
-            get;
-            set;
-        }
-
-
-        public void Connect(string password)
-        {
-            Wifi wifi = new Wifi();
-            IEnumerable<AccessPoint> accessPoints = wifi.GetAccessPoints();
-
-            foreach (AccessPoint ap in accessPoints)
+            get
             {
-                String profileName = ap.Name.Trim((char)0);
-                if (ap.Name.Equals(SSID))
+                StringBuilder builder = new StringBuilder();
+                builder.Append("BssIds: ");
+                foreach (var bssId in BssId)
                 {
-                    if (!ap.IsConnected)
-                    {
-                        AuthRequest authRequest = new AuthRequest(ap);
-                        if (ap.IsSecure && password == "")
-                        {
-                            authRequest.Password = password;
-                        }
-
-                        ap.Connect(authRequest);
-
-                    }
+                    builder.Append(bssId + "\r\n");
                 }
+                return builder.ToString();
             }
         }
+
+        public WiFiPoint(string name, string signalStrength, string description, List<string> bssId, bool isSecured, bool isConnected)
+        {
+            Name = name;
+            SignalStrength = signalStrength;
+            Description = description;
+            BssId = bssId;
+            IsSecured = isSecured;
+            IsConnected = isConnected;
+        }
+
+
+
+        public bool Connect(string password)
+        {
+            Wifi wifi = new Wifi();
+            AccessPoint accessPoint = wifi.GetAccessPoints().FirstOrDefault(x => x.Name.Equals(Name));
+            if (accessPoint != null)
+            {
+                AuthRequest authRequest = new AuthRequest(accessPoint);
+                authRequest.Password = password;
+                return accessPoint.Connect(authRequest);
+            }
+            return false;
+        }
+
     }
 
     

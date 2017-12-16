@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Threading;
+using SimpleWifi;
 
 namespace Laba_7
 {
@@ -50,13 +51,13 @@ namespace Laba_7
         
         private Timer timer;
 
-        private List<WiFiPoint> wifiNetworks = new List<WiFiPoint>();
-        public List<WiFiPoint> WifiNetworks
+        private ObservableCollection<WiFiPoint> wifiNetworks;
+        public ObservableCollection<WiFiPoint> WifiNetworks
         {
             get
             {
                 if (wifiNetworks == null)
-                    wifiNetworks = new List<WiFiPoint>();
+                    wifiNetworks = new ObservableCollection<WiFiPoint>();
                 return wifiNetworks;
             }
         }
@@ -95,53 +96,43 @@ namespace Laba_7
             UpdateWiFiList();
         }
 
-        private List<WiFiPoint> GetWiFiList()
+        private ObservableCollection<WiFiPoint> GetWiFiList()
         {
-            var wlanClient = new WlanClient();
-            List<WiFiPoint> a = new List<WiFiPoint>();
-            foreach (WlanClient.WlanInterface wlanInterface in wlanClient.Interfaces)
-            {
-                List<Wlan.WlanBssEntry> wlanBssEntries = wlanInterface.GetNetworkBssList().ToList();
-                List<Wlan.WlanAvailableNetwork> wlanAvalibleEntries = wlanInterface.GetAvailableNetworkList(0).ToList();
-
-                foreach (Wlan.WlanAvailableNetwork wlanEntry in wlanAvalibleEntries)
-                {
-
-                    Wlan.WlanBssEntry network = new Wlan.WlanBssEntry();
-                    bool finded = false;
-                    foreach (Wlan.WlanBssEntry n in wlanBssEntries)
-                    {
-
-                        if (System.Text.ASCIIEncoding.ASCII.GetString(n.dot11Ssid.SSID).Equals(System.Text.ASCIIEncoding.ASCII.GetString(wlanEntry.dot11Ssid.SSID)))
-                        {
-                            network = n;
-                            finded = true;
-                            wlanBssEntries.Remove(n);
-                            break;
-                        }
-                    }
-
-
-                    if (!finded)
-                        continue;
-                    string mac = (finded)?ConvertMac(network.dot11Bssid):"";
-                    WiFiPoint point = new WiFiPoint
-                    {
-                        SSID = System.Text.ASCIIEncoding.ASCII.GetString(wlanEntry.dot11Ssid.SSID).Trim((char)0),
-                        Quality = wlanEntry.wlanSignalQuality.ToString(),
-                        AuthAlgorithm = wlanEntry.dot11DefaultAuthAlgorithm.ToString().Trim((char)0),
-                        Mac = mac,
-                        HasConnected = (wlanEntry.flags.HasFlag(Wlan.WlanAvailableNetworkFlags.Connected)) ? true : false,
-                        HasProfile = (wlanEntry.flags.HasFlag(Wlan.WlanAvailableNetworkFlags.HasProfile)) ? true : false,
-                    };
-                    a.Add(point);
-                }
-
-            }
-
+            ObservableCollection<WiFiPoint> a = new ObservableCollection<WiFiPoint>();
             
-            return a;
+            var _wifi = new Wifi();
+            var _wlanClient = new WlanClient();
+
+            ObservableCollection<WiFiPoint> networks = new ObservableCollection<WiFiPoint>();
+            List<AccessPoint> accessPoints = _wifi.GetAccessPoints();
+
+            foreach (AccessPoint accessPoint in accessPoints)
+            {
+                networks.Add(new WiFiPoint(accessPoint.Name, accessPoint.SignalStrength.ToString() + "%", accessPoint.ToString(), GetBssId(accessPoint), accessPoint.IsSecure, accessPoint.IsConnected));
+            }
+            return networks;
         }
+        private List<string> GetBssId(AccessPoint accessPoint)
+        {
+            var wlanInterface = _wlanClient.Interfaces.FirstOrDefault();
+            return wlanInterface?.GetNetworkBssList()
+                .Where(x => Encoding.ASCII.GetString(x.dot11Ssid.SSID, 0, (int)x.dot11Ssid.SSIDLength).Equals(accessPoint.Name))
+                .Select(y => Dot11BSSTostring(y)).ToList();
+        }
+
+        private string Dot11BSSTostring(Wlan.WlanBssEntry entry)
+        {
+            StringBuilder bssIdBuilder = new StringBuilder();
+            foreach (byte bssByte in entry.dot11Bssid)
+            {
+                bssIdBuilder.Append(bssByte.ToString("X"));
+                bssIdBuilder.Append("-");
+            }
+            bssIdBuilder.Remove(bssIdBuilder.Length - 1, 1);
+            return bssIdBuilder.ToString();
+        }
+
+
 
         public ModelView()
         {
