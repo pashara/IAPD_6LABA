@@ -63,12 +63,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="WiFiConnection.cs" />
     <Compile Include="WiFiPoint.cs" />
-    <Compile Include="WiFiRecources\AWifiType.cs" />
-    <Compile Include="WiFiRecources\OpenWiFiType.cs" />
-    <Compile Include="WiFiRecources\RSNA_PSKWiFiType.cs" />
-    <Compile Include="WiFiRecources\WPA_PSKWifiType.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

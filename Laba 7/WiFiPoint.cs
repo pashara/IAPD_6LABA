@@ -10,8 +10,6 @@ namespace Laba_7
 {
     public class WiFiPoint
     {
-
-        private AccessPoint accessPoint;
         public string SSID
         {
             get;
@@ -50,18 +48,31 @@ namespace Laba_7
             set;
         }
 
-        public WiFiPoint(AccessPoint accessPoint)
-        {
-            this.accessPoint = accessPoint;
-        }
 
-        public void Connect()
+        public void Connect(string password)
         {
-            if (!accessPoint.IsConnected)
+            Wifi wifi = new Wifi();
+            IEnumerable<AccessPoint> accessPoints = wifi.GetAccessPoints();
+
+            foreach (AccessPoint ap in accessPoints)
             {
-                AuthRequest authRequest = new AuthRequest(accessPoint);
-                accessPoint.Connect(authRequest);
+                String profileName = ap.Name.Trim((char)0);
+                if (ap.Name.Equals(SSID))
+                {
+                    if (!ap.IsConnected)
+                    {
+                        AuthRequest authRequest = new AuthRequest(ap);
+                        if (ap.IsSecure && password == "")
+                        {
+                            authRequest.Password = password;
+                        }
+
+                        ap.Connect(authRequest);
+
+                    }
+                }
             }
+        }
     }
 
     

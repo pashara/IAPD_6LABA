@@ -9,8 +9,6 @@ using System.Runtime.CompilerServices;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Threading;
-using Laba_7.WiFiRecources;
-using SimpleWifi;
 
 namespace Laba_7
 {
@@ -177,119 +175,7 @@ namespace Laba_7
 
         private void ConnectToNetwork(WiFiPoint SelectedWiFiItem)
         {
-            try
-            {
-                WlanClient client = new WlanClient();
-
-
-                foreach (WlanClient.WlanInterface wlanIface in client.Interfaces)
-                {
-                    Wlan.WlanAvailableNetwork[] wlanBssEntries = wlanIface.GetAvailableNetworkList(0);
-                    foreach (Wlan.WlanAvailableNetwork network in wlanBssEntries)
-                    {
-                        String profileName = System.Text.ASCIIEncoding.ASCII.GetString(network.dot11Ssid.SSID).Trim((char)0);
-
-                        // подключаемся именно к выбранной сети
-                        if (SelectedWiFiItem.SSID.Equals(profileName))
-                        {
-                            
-
-                            WiFiConnection.Connect(network, wlanIface, Password);
-                            return;
-
-                            
-                            String strTemplate = "";
-                            String authentication = "";
-                            String encryption = "";
-                            String key = "";
-                            
-                        switch (network.dot11DefaultAuthAlgorithm)
-                            {
-                                case Wlan.Dot11AuthAlgorithm.IEEE80211_Open:
-                                    
-                                    strTemplate = Properties.Resources.OPEN_NETWORK;
-
-                                    authentication = "open";
-
-                                    encryption = network.dot11DefaultCipherAlgorithm.ToString().Trim((char)0);
-                                    encryption = "AES";
-                                    
-                                    if (!network.flags.HasFlag(Wlan.WlanAvailableNetworkFlags.HasProfile))
-                                    {
-                                        String profileXml = String.Format(strTemplate, profileName, authentication, encryption, "");
-                                        wlanIface.SetProfile(Wlan.WlanProfileFlags.AllUser, profileXml, true);
-                                    }
-
-                                    //SMTH
-                                    wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profileName);
-                                    return;
-                                    break;
-                                case Wlan.Dot11AuthAlgorithm.WPA:
-                                    //Not found.
-                                    break;
-
-                                case Wlan.Dot11AuthAlgorithm.WPA_PSK: // WPA_PSK
-
-                                    strTemplate = Properties.Resources.WPAPSK;
-
-                                    authentication = "WPAPSK";
-
-                                    encryption = network.dot11DefaultCipherAlgorithm.ToString().Trim((char)0);
-                                    encryption = "AES";
-                                    // пароль к сети
-                                    key = Password;
-                                    //34096811
-
-                                    if (!network.flags.HasFlag(Wlan.WlanAvailableNetworkFlags.HasProfile) || key.Length > 0)
-                                    {
-                                        String profileXml = String.Format(strTemplate, profileName, authentication, encryption, key);
-                                        wlanIface.SetProfile(Wlan.WlanProfileFlags.AllUser, profileXml, true);
-                                    }
-
-                                    //SMTH
-                                    wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profileName);
-                                    return;
-                                    break;
-
-                                case Wlan.Dot11AuthAlgorithm.RSNA_PSK: // WPA_PSK
-
-                                    strTemplate = Properties.Resources.WPAPSK;
-
-                                    authentication = "WPA2PSK";
-
-                                    //encryption = network.dot11DefaultCipherAlgorithm.ToString().Trim((char)0);
-                                    encryption = "AES";
-                                    // пароль к сети
-                                    key = Password;
-                                    //34096811
-
-                                    if (!network.flags.HasFlag(Wlan.WlanAvailableNetworkFlags.HasProfile) && key.Length > 0)
-                                    {
-                                        String profileXml = String.Format(strTemplate, profileName, authentication, encryption, key);
-                                        wlanIface.SetProfile(Wlan.WlanProfileFlags.AllUser, profileXml, true);
-                                    }
-
-                                    //SMTH
-                                    wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profileName);
-                                    return;
-                                    break;
-
-                                default:
-                                    break;
-                            }
-
-
-
-
-
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            SelectedWiFiItem.Connect(Password);
         }
 
 
