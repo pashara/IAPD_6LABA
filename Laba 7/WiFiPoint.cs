@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimpleWifi;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,6 +10,8 @@ namespace Laba_7
 {
     public class WiFiPoint
     {
+
+        private AccessPoint accessPoint;
         public string SSID
         {
             get;
@@ -46,6 +49,19 @@ namespace Laba_7
             get;
             set;
         }
+
+        public WiFiPoint(AccessPoint accessPoint)
+        {
+            this.accessPoint = accessPoint;
+        }
+
+        public void Connect()
+        {
+            if (!accessPoint.IsConnected)
+            {
+                AuthRequest authRequest = new AuthRequest(accessPoint);
+                accessPoint.Connect(authRequest);
+            }
     }
 
     

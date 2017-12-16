@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Threading;
 using Laba_7.WiFiRecources;
+using SimpleWifi;
 
 namespace Laba_7
 {
@@ -49,9 +50,7 @@ namespace Laba_7
             }
         }
         
-
         private Timer timer;
-
 
         private List<WiFiPoint> wifiNetworks = new List<WiFiPoint>();
         public List<WiFiPoint> WifiNetworks
@@ -71,19 +70,16 @@ namespace Laba_7
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
         }
-
-
+        
         private void UpdateWiFiList()
         {
             WiFiPoint a = SelectedWiFiItem;
 
             var wifiNetworks1 = GetWiFiList();
             wifiNetworks = wifiNetworks1;
-            //var sss = new ObservableCollection<WiFiPoint>();
             bool isFindedSelected = false;
             foreach(var asd in wifiNetworks)
             {
-                //sss.Add(asd);
                 if(!isFindedSelected)
                 {
                     if (asd.SSID.Equals(a.SSID))
@@ -94,15 +90,12 @@ namespace Laba_7
             }
 
             OnPropertyChanged(nameof(WifiNetworks));
-
-
         }
+
         private void OnLanChangeList(Object stateInfo)
         {
-
             UpdateWiFiList();
         }
-
 
         private List<WiFiPoint> GetWiFiList()
         {
@@ -112,7 +105,6 @@ namespace Laba_7
             {
                 List<Wlan.WlanBssEntry> wlanBssEntries = wlanInterface.GetNetworkBssList().ToList();
                 List<Wlan.WlanAvailableNetwork> wlanAvalibleEntries = wlanInterface.GetAvailableNetworkList(0).ToList();
-
 
                 foreach (Wlan.WlanAvailableNetwork wlanEntry in wlanAvalibleEntries)
                 {
