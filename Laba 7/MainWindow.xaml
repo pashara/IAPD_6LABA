@@ -49,7 +49,7 @@
 
 
 
-                        <TextBlock Text="{Binding SSID}" Grid.Column="0" />
+                        <TextBlock Text="{Binding Name}" Grid.Column="0" />
 
                         <TextBlock Text="{Binding Mac}" Grid.Column="1" />
 
@@ -58,10 +58,10 @@
                             <Image.Style>
                                 <Style TargetType="{x:Type Image}">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding HasConnected}" Value="False">
+                                        <DataTrigger Binding="{Binding IsConnected}" Value="False">
                                             <Setter Property="Source" Value="C:\Users\admin\Documents\ИИпУ\Laba 6\Laba 6\Laba 6\disable.png"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding HasConnected}" Value="True">
+                                        <DataTrigger Binding="{Binding IsConnected}" Value="True">
                                             <Setter Property="Source" Value="C:\Users\admin\Documents\ИИпУ\Laba 6\Laba 6\Laba 6\enable.png"/>
                                         </DataTrigger>
                                     </Style.Triggers>
@@ -99,7 +99,7 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <TextBlock Text="{Binding SelectedWiFiItem.SSID}" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3"></TextBlock>
+        <TextBlock Text="{Binding SelectedWiFiItem.Name}" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3"></TextBlock>
         
         <TextBox x:Name="SearchTermTextBox" Padding="5" Margin="0,0,10,0" Text="{Binding Password, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Grid.Column="0" Grid.Row="3"/>
         <TextBlock IsHitTestVisible="False" Text="{Binding PasswordPlaceholder}" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,0,0,0" Foreground="DarkGray"  Grid.Column="0" Grid.Row="3">

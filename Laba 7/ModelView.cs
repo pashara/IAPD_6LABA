@@ -20,7 +20,10 @@ namespace Laba_7
         public string SendButtonText => Properties.Resources.ConnectButton;
         public string PasswordPlaceholder => Properties.Resources.PasswordPlaceholder;
 
-        WiFiPoint _selectedWiFiItem = new WiFiPoint();
+        private readonly WifiFinder _searcher = new WifiFinder();
+        private ObservableCollection<WiFiPoint> networks;
+
+        WiFiPoint _selectedWiFiItem = null;
         public WiFiPoint SelectedWiFiItem
         {
             get
@@ -60,6 +63,12 @@ namespace Laba_7
                     wifiNetworks = new ObservableCollection<WiFiPoint>();
                 return wifiNetworks;
             }
+
+            set
+            {
+                wifiNetworks = value;
+                OnPropertyChanged(nameof(WifiNetworks));
+            }
         }
   
         public event PropertyChangedEventHandler PropertyChanged;
@@ -72,23 +81,8 @@ namespace Laba_7
         
         private void UpdateWiFiList()
         {
-            WiFiPoint a = SelectedWiFiItem;
-
-            var wifiNetworks1 = GetWiFiList();
-            wifiNetworks = wifiNetworks1;
-            bool isFindedSelected = false;
-            foreach(var asd in wifiNetworks)
-            {
-                if(!isFindedSelected)
-                {
-                    if (asd.SSID.Equals(a.SSID))
-                    {
-                        SelectedWiFiItem = asd;
-                    }
-                }
-            }
-
-            OnPropertyChanged(nameof(WifiNetworks));
+            networks = _searcher.GetWiFiList();
+            WifiNetworks = networks;
         }
 
         private void OnLanChangeList(Object stateInfo)
@@ -96,29 +90,6 @@ namespace Laba_7
             UpdateWiFiList();
         }
 
-        private ObservableCollection<WiFiPoint> GetWiFiList()
-        {
-            ObservableCollection<WiFiPoint> a = new ObservableCollection<WiFiPoint>();
-            
-            var _wifi = new Wifi();
-            var _wlanClient = new WlanClient();
-
-            ObservableCollection<WiFiPoint> networks = new ObservableCollection<WiFiPoint>();
-            List<AccessPoint> accessPoints = _wifi.GetAccessPoints();
-
-            foreach (AccessPoint accessPoint in accessPoints)
-            {
-                networks.Add(new WiFiPoint(accessPoint.Name, accessPoint.SignalStrength.ToString() + "%", accessPoint.ToString(), GetBssId(accessPoint), accessPoint.IsSecure, accessPoint.IsConnected));
-            }
-            return networks;
-        }
-        private List<string> GetBssId(AccessPoint accessPoint)
-        {
-            var wlanInterface = _wlanClient.Interfaces.FirstOrDefault();
-            return wlanInterface?.GetNetworkBssList()
-                .Where(x => Encoding.ASCII.GetString(x.dot11Ssid.SSID, 0, (int)x.dot11Ssid.SSIDLength).Equals(accessPoint.Name))
-                .Select(y => Dot11BSSTostring(y)).ToList();
-        }
 
         private string Dot11BSSTostring(Wlan.WlanBssEntry entry)
         {
@@ -162,28 +133,39 @@ namespace Laba_7
             }
             return mac;
         }
-
-
-        private void ConnectToNetwork(WiFiPoint SelectedWiFiItem)
-        {
-            SelectedWiFiItem.Connect(Password);
-        }
+        
 
 
 
         private void MainWindow_OnConnectClick()
         {
 
-            WiFiPoint item = SelectedWiFiItem;
-            if (item != null)
+
+            if (Password.Length > 0)
             {
-                MessageBoxResult result = MessageBox.Show(String.Format(Properties.Resources.ConnectConfirmText, item.SSID), "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                if (result == MessageBoxResult.Yes)
+                WiFiPoint item = SelectedWiFiItem;
+
+                if(item != null)
                 {
-                    ConnectToNetwork(item);
-                }
-                UpdateWiFiList();
+                    MessageBoxResult result = MessageBox.Show(String.Format(Properties.Resources.ConnectConfirmText, item.Name), "Confirmation", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        if (item.Connect(Password))
+                        {
+                            /*ConnectionStatusL.Text = "Connected";
+                            PasswordF.Enabled = false;
+                            ConnectionB.Enabled = false;
+                            NetworkList.SelectedItems[0].Selected = false;*/
+                        }
+                        else
+                        {
+                            //ConnectionStatusL.Text = "Error";
+                        }
+                    }
+                    UpdateWiFiList();
+                }                
             }
+            
         }
 
     }

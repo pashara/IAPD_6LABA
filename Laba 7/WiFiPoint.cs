@@ -12,33 +12,21 @@ namespace Laba_7
     {
         public string Name { get; set; }
         public string SignalStrength { get; set; }
-        public string Description { get; set; }
-        public List<string> BssId { get; set; }
-        public bool IsSecured { get; set; }
+        public string AuthAlgorithm { get; set; }
+        public bool HasProfile { get; set; }
         public bool IsConnected { get; set; }
+        public string Mac { get; set; }
 
-        public string BssIds
-        {
-            get
-            {
-                StringBuilder builder = new StringBuilder();
-                builder.Append("BssIds: ");
-                foreach (var bssId in BssId)
-                {
-                    builder.Append(bssId + "\r\n");
-                }
-                return builder.ToString();
-            }
-        }
+       
 
-        public WiFiPoint(string name, string signalStrength, string description, List<string> bssId, bool isSecured, bool isConnected)
+        public WiFiPoint(string name, string signalStrength, string algorithm, bool hasProfile, bool isSecured, bool isConnected, string mac)
         {
             Name = name;
             SignalStrength = signalStrength;
-            Description = description;
-            BssId = bssId;
-            IsSecured = isSecured;
+            AuthAlgorithm = algorithm;
+            HasProfile = hasProfile;
             IsConnected = isConnected;
+            Mac = mac;
         }
 
 
